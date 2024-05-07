@@ -67,8 +67,8 @@ def from_pandas_csv(path: str, result_col_name: str, index_col: str = None, text
 if __name__ == '__main__':
     df = from_pandas_csv(
         path="fol.csv",
-        result_col_name="Hermes-2-Pro-Mistral-7B.Q6_K",
+        result_col_name="Hermes-2-Pro-Llama-3-8B-Q6_K",
         index_col="index",
         text_col_name="text"
     )
-    df.to_csv("fol_result.csv")
+    df.to_csv("fol.csv")
