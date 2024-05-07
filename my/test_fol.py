@@ -1,4 +1,6 @@
+import pandas as pd
 import requests
+from tqdm import tqdm
 
 
 URL = "http://localhost:5002/completion"
@@ -37,11 +39,36 @@ def console_cycle():
         print(f"Output: {content}")
 
 
-if __name__ == '__main__':
-    texts = from_csv("/home/haaohi/Загрузки/fol_text.txt")
+def from_txt(path: str = "fol_text.txt"):
+    texts = from_csv(path)
     list_text = texts.split("\n")
     for index, text in enumerate(list_text):
         if len(text) != 0:
             content = llm_output(instruction=INSTRUCTION_FOL, user_input=text)["content"]
             output = content[:content.find("<|im_end|>")]
             print(f"{index+1}) {text}\nOutput: {output}")
+
+
+def from_pandas_csv(path: str, result_col_name: str, index_col: str = None, text_col_name: str = "text", delimiter: str = ";"):
+    df = pd.read_csv(path, index_col=index_col, delimiter=delimiter)
+    result = []
+    with tqdm(total=df.shape[0]) as pb:
+        for index, row in df.iterrows():
+            text = row[text_col_name]
+            content = llm_output(instruction=INSTRUCTION_FOL, user_input=text)["content"]
+            output = content[:content.find("<|im_end|>")]
+            result.append(output)
+            pb.update(1)
+    num_columns = len(df.columns)
+    df.insert(num_columns, result_col_name, result, True)
+    return df
+
+
+if __name__ == '__main__':
+    df = from_pandas_csv(
+        path="fol.csv",
+        result_col_name="Hermes-2-Pro-Mistral-7B.Q6_K",
+        index_col="index",
+        text_col_name="text"
+    )
+    df.to_csv("fol_result.csv", index=False)

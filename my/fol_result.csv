@@ -1,0 +1,164 @@
+text,Hermes-2-Pro-Mistral-7B.Q6_K
+My name is John,∃x (name(x) ∧ John(x))
+I see John,∃w (V(w) ∧ S(w) ∧ I(w) ∧ J(w))
+John sees Jane,∃w (John(w) ∧ sees(w) ∧ Jane(w))
+John sees a person,∃x (John sees x ∧ Person(x))
+Mary loves everyone,"∀x (L(M, x)), where L is a predicate representing the ""loves"" relation, M is a constant representing Mary, and x is a variable representing an individual in the domain. The domain should include all individuals that Mary could potentially love."
+No one talks,"∀x, ¬(Talks(x))"
+Mary likes every person,"∀x (likes(Mary, x))"
+Nobody talks,"∀x, ¬(talks(x))"
+Every person loves themselves,"∀x (Person(x) → Loves(x, x))"
+Not every person loves themselves,"∀x (Person(x) → ¬Loves(x, x))"
+Every person does not love themselves,"∀x (Person(x) → ¬Loves(x, x))"
+Some people don't love themselves,"∃x (Person(x) ∧ ¬Loves(x, x))"
+No one loves themselves,"∀x, ¬(L(x, x))"
+Nobody loves themselves,"∀x, ¬(loves(x, x))"
+Everyone loves everyone,"∀x ∀y (L(x, y) ∧ x ∈ U ∧ y ∈ U)
+
+Here, U represents the domain of individuals, L(x, y) represents the predicate ""loves"" between individuals x and y, and the double universal quantifier (∀x ∀y) is used to express that every individual in the domain loves every other individual in the domain."
+A student smiles,∃x (Student(x) ∧ Smiles(x))
+Every student smiles,"∀x (S(x) → Sm(x))
+
+Here, we define the domain of discourse to be the set of all students. The predicate S(x) represents 'x is a student', and Sm(x) represents 'x smiles'. The universal quantifier ∀x indicates that the statement holds for every student in the domain. The implication (→) connects the predicate S(x) with Sm(x), meaning that if x is a student, then x smiles."
+Every student except John dances,∀x (Student(x) ∧ ¬John(x) → Dances(x))
+Everyone dances or sleeps,∀x (dances(x) ∨ sleeps(x))
+Every person dances and sleeps,∀x (Person(x) → (Dances(x) ∧ Sleeps(x)))
+Every student who likes Mary is happy,"∀x (student(x) ∧ likes(x, Mary) → happy(x))"
+Every student who likes apples is healthy,"∀x (likes(x, apples) → healthy(x))"
+John likes apples,"∃x (John(x) ∧ Apple(y) ∧ Likes(x, y))"
+John is not Mary,∀x (x = john → ¬(x = mary))
+John is not a llama,∀x ( (x = john) → ¬(x = llama) )
+Not all those who wander are lost,"∀x (W(x) → ¬L(x))
+
+Let's define the following predicates:
+- W(x): x is a person who wanders
+- L(x): x is a person who is lost
+
+The sentence ""Not all those who wander are lost"" can be translated into first-order logic as above, stating that for all x in the domain, if x wanders (W(x)), then x is not lost (¬L(x))."
+No people who wander are lost,∀x (wanders(x) → ¬lost(x))
+John does not love anyone,"∀x (¬(loves(john, x)))"
+John does not love everyone,"∀x (¬(loves(john, x)))"
+Everyone who sees Mary loves Mary,"∀x (sees(x, Mary) → loves(x, Mary))"
+Everyone loves someone,"∀x ∃y (Loves(x, y))"
+Someone loves everyone,"∃x (∀y (L(x, y)))"
+Someone respects everyone,"∃x ∀y (respects(x, y))"
+Someone sees everyone,"∃x (Sees(x, ∀y))"
+Someone reads and thinks,∃x (Reads(x) ∧ Thinks(x))
+Everyone who thinks is smart,∀x (Thinks(x) → Smart(x))
+No one who runs walks,∀x (Runs(x) → ¬Walks(x))
+"If anyone cheats, he suffers",∀x (C(x) → S(x))
+"If anyone cheats, the person suffers",∀x (C(x) → S(x))
+"If anyone cheats, a person suffers",∃x (Cheats(x) → ∃y (Suffers(y)))
+"If anyone cheats, everyone suffers","∀x (Cx → S)
+
+Let's define the domain of discourse as a set of individuals, represented by x. We introduce two unary predicates: C(x) to represent the fact that individual x cheats, and S(x) to represent the fact that individual x suffers. The sentence can be translated into first-order logic as follows: for all x in the domain, if x cheats (Cx), then everyone suffers (S). The logical representation uses the universal quantifier (∀x) and the material implication (→) to express the conditional relationship between cheating and suffering."
+"If someone cheats, everybody else suffers",∀x (Cheats(x) → ∀y (Suffers(y) ∧ y ≠ x))
+"If somebody cheats, everybody else suffers","∀x (Cx → ∀y (Nxy → Sy))
+
+In this representation, we define the domain of individuals as 'x' and 'y'. 'Cx' represents the predicate that an individual 'x' cheats, 'Nxy' represents the predicate that individual 'x' does not suffer and individual 'y' suffers, and 'Sy' represents the predicate that individual 'y' suffers. The logical representation states that for all individuals 'x', if 'x' cheats, then for all individuals 'y', if 'x' does not suffer and 'y' suffers, 'y' suffers. This captures the meaning and structure of the original sentence while preserving its logical consistency."
+Mary loves everyone except John,"∀x ( (x = John ∧ Loves(Mary, x)) → ¬Loves(Mary, x) ) ∧ ∀x ( (x ≠ John ∧ Loves(Mary, x)) → Loves(Mary, x) )"
+Anyone who loves everyone loves himself.,"∀x (Lx∀y → Lex), where:
+
+- ∀x and ∀y represent universal quantifiers, ranging over all individuals x and y, respectively.
+- Lx∀y represents the predicate ""loves"" with x as the subject and y as the object.
+- Lex represents the predicate ""loves"" with x as the subject and himself (x) as the object."
+I don't know you,"∀x (Person(x) → ¬Knows(x, y))"
+Nobody knows the answer,"∀x, ¬Knows(x, Answer)"
+Jim doesn't remember what Jack told him,"∀x (Person(x) → (Remember(Jim, x) ⊕ ¬Remember(Jim, x))) ∧ ∀y (Person(y) → (Told(Jack, y) ⊕ ¬Told(Jack, y))) ∧ ∃z (Person(z) ∧ ¬Remember(Jim, z) ∧ Told(Jack, z))"
+Jane seems to know a lot of things,∃K (K = knows) ∧ (Jane ∩ K) ∩ a lot of things ≠ ∅
+John will either stay or go away,∃ x (John = x ∧ (Stay(x) ∨ GoAway(x)))
+University students pay attention to teachers,"∀x (Student(x) → ∀y (Teacher(y) → Attention(x, y)))"
+University students do not pay attention to teachers,"∀x (Student(x) → ¬(Attention(x, Teacher(y)))))"
+Every professor has a favorite joke that they always tell to students,"∀x (Professor(x) → ∃y (FavoriteJoke(y) ∧ AlwaysTell(x, y, Students)))"
+Every university professor is a person who knows some subject well,"∀x (UniversityProfessor(x) → Person(x) ∧ ∃y (KnowsWell(x, y)))"
+Not every university professor is happy,∀x (UniversityProfessor(x) → ¬Happy(x))
+No university professor is happy,∀x (Professor(x) → ¬Happy(x))
+None of the university professors are happy,∀x (Professor(x) → ¬Happy(x))
+None of Joyce's books are easy to understand,"∀x (Book(x) ∧ Author(x, Joyce) → Difficult(x))"
+Everybody sleeps,∀x (Sleep(x))
+Nobody sleeps who is unhappy,∀x (¬happy(x) → ¬asleep(x))
+Please don't leave your belongings behind,"∀x (P(x) → ¬L(x)) ∧ ∀x∀y (L(x) ∧ P(y) → x ≠ y)
+
+In this representation, we define the following predicates and constants:
+- P(x): x is a belonging.
+- L(x): x is left behind.
+
+The sentence ""Please don't leave your belongings behind"" can be translated into FOL as ""For all x, if x is a belonging, then x is not left behind, and for all x and y, if x is left behind and y is a belonging, then x is not equal to y."" This representation captures the meaning of the original sentence by stating that all belongings should not be left behind and that no two belongings should be left behind at the same time."
+Does John have any books by Tolkien?,"∃x (Book(x) ∧ Author(x, Tolkien) ∧ Possesses(John, x))"
+John doesn't have Tolkien's books,"∀x (has(John, x) ⊗ author(x, Tolkien) → ¬has(John, x))"
+Anyone who has a cat also likes dogs,∀x (hasCat(x) → likesDogs(x))
+Anyone who has a cat also likes dogs who like cats,"∀x (Cx → (Lx,D ∧ ∀y (Cy → Lyx)))"
+Not all people who like to wash the dishes also like to clean the bathroom,"∀x (likes(x, washDishes) → ¬(likes(x, cleanBathroom) ∧ likes(x, washDishes)))"
+If John doesn't study he will fail the exam,"∀x (John(x) ∧ ¬Studies(x) → Fail(x, exam))"
+Everyone whose name is John is lucky,"∀x (name(x) = ""John"" → lucky(x))"
+Not all heroes wear capes,∀x (H(x) → ¬C(x))
+Everybody was not examined,∀x ¬Examined(x)
+John would like to introduce his friend Jack,"∃x∃y (John(x) ∧ Jack(y) ∧ Friend(x, y) ∧ Introduce(x, y))"
+The quick brown fox jumps over the lazy dog,"∃x (Animal(x) ∧ Quick(x) ∧ Brown(x) ∧ Fox(x) ∧ ∃y (Animal(y) ∧ Lazy(y) ∧ Dog(y) ∧ JumpsOver(x, y)))"
+Jack is a friend of John,"∃x (Friend(x, John) ∧ x = Jack)"
+Joe Biden is the president of the United States of America,"∃x (President(x) ∧ Name(x, ""Joe Biden"") ∧ Country(x, ""United States of America""))"
+Nobody ever wanted to become president,"∀x (¬(wanted(x, president))), where:
+
+- x represents an individual from the relevant domain (e.g., people in a certain time period or population)
+- wanted(x, president) represents the proposition that individual x wanted to become president
+- ∀ denotes universal quantification, meaning that the statement holds for all individuals in the domain."
+No person would ever want to become president,"∀x (Person(x) → ¬(Want(x, BecomePresident))), where:
+
+- Person(x) is a unary predicate that holds if x is a person.
+- Want(x, y) is a binary predicate that holds if x wants y.
+- BecomePresident is a unary function that represents the act of becoming president.
+- ¬ denotes negation."
+I don't like apples that taste bad,"∀x (Apple(x) → (TasteBad(x) → ¬(Like(I, x))))"
+Untasty apples are not liked by anybody,"∀x (Unlike(x) → ∀y ¬Likes(y, x))"
+I don't see any point in doing that,¬P(x) ∀x (D(x) → (A(x) → (B(x) → (C(x) → (S(x) → ¬O(x)))))
+Small children are usually very curious,"∀x (Child(x) ∧ Small(x) → Curious(x))
+
+In this representation, we define the following predicates:
+- Child(x): x is a child
+- Small(x): x is small
+- Curious(x): x is curious
+
+The universal quantifier (∀x) applies to all elements in the domain, and the implication (→) represents the ""usually"" aspect of the sentence, indicating that small children are typically curious."
+Daunting tasks can be very rewarding when completed,"∀x (DauntingTask(x) → (Reward(x) ∧ Completed(x) → VeryRewarding(x))),
+where:
+- x represents a task
+- DauntingTask(x) is a unary predicate that holds if x is a daunting task
+- Reward(x) is a unary predicate that holds if x is rewarding
+- Completed(x) is a unary predicate that holds if x is completed
+- VeryRewarding(x) is a unary predicate that holds if x is very rewarding
+
+The logical representation states that for all tasks x, if x is a daunting task, then when x is both completed and rewarding, it is very rewarding."
+All people except Socrates are mortal,∀x ( (x is a person) ∧ (x ≠ Socrates) → (x is mortal) )
+Nobody here apart from John is patient,∀x ( (x ≠ John ∧ ∃y (y = x ∧ Patient(y))) → ¬(Here(y) ∧ ∀z (Here(z) → (z = y ∨ z = John))))
+The times are changing rapidly and old people hate it,"∀x (Old(x) → Hates(x, ChangingRapidly)),
+HoldingConstant(Times),
+ChangingRapidly(Times)"
+Twenty kilograms of meat is a lot,"∃x (Meat(x) ∧ Mass(x, 20) ∧ Lot(x))"
+Ignorance is strength,∀x (Ignorant(x) → Strong(x))
+People dislike being told what to do by other people who are unqualified to do so,"∀x, (P(x) ∧ ∀y (P(y) → (U(x, y) → ¬Q(x, y)))) → ∀y (P(y) → ¬(L(x, y) ∧ U(x, y)))
+
+In this representation:
+- P(x) represents that x is a person.
+- L(x, y) represents that x is telling y what to do.
+- U(x, y) represents that x is unqualified to tell y what to do.
+- Q(x, y) represents that y dislikes being told what to do by x.
+
+The universal quantifier ∀x applies to all people, and the implication states that if x is a person and for all y (if y is a person, then if x is unqualified to tell y what to do, then x does not tell y what to do), then for all y (if y is a person, then x does not tell y what to do and x is unqualified to tell y what to do). This captures the meaning of the origina"
+No amount of arguing is going to persuade John to get a cat,"∀x (arguing(x) → ¬(persuade(John, get_cat) ∧ argument_about(x, John, get_cat)))"
+John is a person who likes dogs,"∃x (Person(x) ∧ Likes(x, Dog)) ∧ John = x"
+Dan makes mistakes,"∃m (Mistake(m) ∧ Maker(Dan, m))"
+What Josh dislikes is bats,"∃x (Josh(x) ∧ Dislikes(x, bats))"
+There are a lot of problems in the world,∃x (problem(x) ∧ ∀y (problem(y) → y = x))
+Josh's hobbies are painting and reading,"∃x (Name(x, ""Josh"") ∧ ∀y (Hobby(y, x) → (Painting(y) ∨ Reading(y))))"
+Big round red balls are scary,∀x ( (Big(x) ∧ Round(x) ∧ Red(x)) → Scary(x) )
+James does not understand first-order logic,∀x (x = James → ¬(x understands first-order logic))
+Jane loves getting to know other people,"∃x (Person(x) ∧ Loves(Jane, GetToKnow(Jane, x)))"
+Using drugs is very dangerous,∀x (D(x) → Dangerous(UsingDrugs(x)))
+People who stay up late don't like people who go to bed early,"∀x (Late(x) → ¬Early(x)), where:
+
+- Domain: People (P)
+- Predicates: Late(x) (person x stays up late), Early(x) (person x goes to bed early)
+- Quantifier: ∀x (for all people x)
+- Implication: → (if... then...)
+- Negation: ¬ (not)"
+Cats are not dogs,∀x (C(x) ⇒ ¬D(x))

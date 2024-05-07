@@ -1,6 +1,6 @@
- My name is John
- I see John
- John sees Jane
+My name is John
+I see John
+John sees Jane
 John sees a person
 Mary loves everyone
 No one talks
