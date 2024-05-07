@@ -71,4 +71,4 @@ if __name__ == '__main__':
         index_col="index",
         text_col_name="text"
     )
-    df.to_csv("fol_result.csv", index=False)
+    df.to_csv("fol_result.csv")
