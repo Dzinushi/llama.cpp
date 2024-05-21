@@ -21,22 +21,24 @@ class TestLLM:
 
 
 class TestLLMTerminal(TestLLM):
-    def __call__(self, llm_pattern_name: str, instruction: str = ""):
+    def __call__(self, llm_pattern_name: str, instruction: str = "", use_correct_fol: bool = False, filter_prompt_end: str = None):
         simple_api_server = LlamaServerSimpleAPI()
         prompt_fn = PromptPatternBuilder.create(llm_pattern_name)
         while True:
-            # user_input = "I see John"
+            # example: "I see John"
             user_input = input("User: ")
             response = simple_api_server(prompt_fn(instruction=instruction, user_input=user_input))
-            content = response["content"]
-            # content = "∃x (Person(x) ∧ Sees(x, John))"
-            if bleu:
-                bleu_input = input("BLEU (FOL-rule): ")
-                # bleu_input = "∃x (I(x) → Sees(x, John))"
-                res = self.metrics.evaluate(None, bleu_input, None, content)
+            llm_fol = response["content"]
+            if filter_prompt_end is not None:
+                llm_fol = llm_fol[:llm_fol.find(filter_prompt_end)]
+            if use_correct_fol:
+                # llm_fol: "∃x (Person(x) ∧ Sees(x, John))"
+                # correct_fol: "∃x (I(x) → Sees(x, John))"
+                correct_fol = input("Correct-FOL-rule: ")
+                res = self.metrics.evaluate(None, correct_fol, None, llm_fol)
                 bleu, LE = res.FOL_bleu, res.FOL_LE
-                print(f"Output: {content}. BLEU: {bleu:.3f}, LE: {LE:.3f}")
-            print(f"Output: {content}")
+                print(f"Output: {llm_fol}. BLEU: {bleu:.3f}, LE: {LE:.3f}")
+            print(f"Output: {llm_fol}")
 
 
 class TestLLMCSV(TestLLM):
@@ -141,7 +143,7 @@ class TestLLMMALL(TestLLM):
 
     def __call__(self,
                  path_to_test: str,
-                 llm_prompt_name: str,
+                 llm_pattern_name: str,
                  instruction: str,
                  temp_save_file_path: str,
                  continue_process: bool = False,
@@ -153,7 +155,7 @@ class TestLLMMALL(TestLLM):
         with open(path_to_test, "r") as f:
             data = json.load(f)
         simple_server_api = LlamaServerSimpleAPI()
-        prompt_fn = PromptPatternBuilder().create(llm_prompt_name)
+        prompt_fn = PromptPatternBuilder().create(llm_pattern_name)
         data_dict = {
             tfs.NL: [],
             tfs.FOL: [],
