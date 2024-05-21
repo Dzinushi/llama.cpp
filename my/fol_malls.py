@@ -2,6 +2,7 @@ from eval_fol_llm import TestLLMMALL
 import json
 from argparse import ArgumentParser
 from utils import str_to_bool
+import pandas as pd
 
 
 INSTRUCTION_FOL = ("Translate the following natural language (NL) statement to a first-order logic (FOL) rule. "
@@ -21,7 +22,8 @@ def parse_args():
     parser.add_argument("--temp_save_file_path", type=str)
     parser.add_argument("--filter_prompt_end", type=str, default=None)
     parser.add_argument("--continue_process", type=str_to_bool)
-    parser.add_argument("--json_save_file_path", type=str)
+    # parser.add_argument("--json_save_file_path", type=str)
+    parser.add_argument("--csv_save_file_path", type=str)
     return parser.parse_args()
 
 
@@ -36,5 +38,8 @@ if __name__ == '__main__':
         temp_save_file_path=args.temp_save_file_path,
         continue_process=args.continue_process
     )
-    with open(args.json_save_file_path, "w") as f:
-        json.dump(result_json, f)
+    # with open(args.json_save_file_path, "w") as f:
+    #     json.dump(result_json, f)
+
+    df = pd.DataFrame.from_dict(result_json)
+    df.to_csv(args.csv_save_file_path, sep=";", index=False)
