@@ -1,6 +1,6 @@
 from llama_server_api import LlamaServerSimpleAPI
 from llm_pattern_builder import PromptPatternBuilder
-from LogicLLaMA.metrics import UniversalMetrics
+from metrics_timer import MetricLE, MetricBLEU
 import pandas as pd
 from tqdm import tqdm
 import json
@@ -15,7 +15,8 @@ def mean(data: List) -> float:
 
 class TestLLM:
     def __init__(self):
-        self.metrics = UniversalMetrics()
+        self.le = MetricLE()
+        self.bleu = MetricBLEU()
 
     def __call__(self, *args, **kwargs):
         pass
@@ -35,9 +36,9 @@ class TestLLMTerminal(TestLLM):
                 # llm_fol: "∃x (Person(x) ∧ Sees(x, John))"
                 # correct_fol: "∃x (I(x) → Sees(x, John))"
                 correct_fol = input("Correct-FOL-rule: ")
-                res = self.metrics.evaluate(None, correct_fol, None, llm_fol)
-                bleu, LE = res.FOL_bleu, res.FOL_LE
-                print(f"Output: {llm_fol}. BLEU: {bleu:.3f}, LE: {LE:.3f}")
+                le = self.le(true_text_FOL=correct_fol, pred_text_FOL=llm_fol)
+                bleu = self.bleu(true_seq=correct_fol, pred_seq=llm_fol)
+                print(f"Output: {llm_fol}. BLEU: {bleu:.3f}, LE: {le:.3f}")
             print(f"Output: {llm_fol}")
 
 
@@ -67,8 +68,8 @@ class TestLLMCSV(TestLLM):
                 prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
                 if correct_fol_column is not None:
                     correct_fol = row[correct_fol_column]
-                    res = self.metrics.evaluate(None, correct_fol, None, llm_fol)
-                    bleu, le = res.FOL_bleu, res.FOL_LE
+                    le = self.le(true_text_FOL=correct_fol, pred_text_FOL=llm_fol)
+                    bleu = self.bleu(true_seq=correct_fol, pred_seq=llm_fol)
                     result_bleu.append(bleu)
                     result_le.append(le)
                 result_fol.append(llm_fol)
@@ -176,8 +177,8 @@ class TestLLMMALL(TestLLM):
                     correct_fol = item["FOL"]
                     llm_fol = simple_server_api(prompt_fn(instruction=instruction, user_input=text))["content"]
                     prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
-                    res = self.metrics.evaluate(None, correct_fol, None, llm_fol)
-                    bleu, le = res.FOL_bleu, res.FOL_LE
+                    le = self.le(true_text_FOL=correct_fol, pred_text_FOL=llm_fol)
+                    bleu = self.bleu(true_seq=correct_fol, pred_seq=llm_fol)
                     data_dict[tfs.NL].append(text)
                     data_dict[tfs.FOL].append(correct_fol)
                     data_dict[tfs.LLM_FOL].append(llm_fol)
@@ -188,4 +189,3 @@ class TestLLMMALL(TestLLM):
                                        f"le: {mean(data_dict[tfs.LE]):.3f})")
                     pb.update(1)
         return data_dict
-
