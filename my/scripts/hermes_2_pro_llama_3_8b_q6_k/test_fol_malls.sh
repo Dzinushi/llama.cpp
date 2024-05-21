@@ -28,4 +28,4 @@ python -m fol_malls \
     --filter_prompt_end="<|im_end|>" \
     --temp_save_file_path="./data/malls_hermes_2_pro_llama_3_8b_Q6_K.txt" \
     --continue_process="yes" \
-    --json_save_file_path="./data/malls_hermes_2_pro_llama_3_8b_Q6_K.json"
+    --csv_save_file_path="./data/malls_hermes_2_pro_llama_3_8b_Q6_K.csv"
