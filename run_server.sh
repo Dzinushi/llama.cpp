@@ -10,7 +10,7 @@ threads=6 # num cpu threads for processing
 main_gpu=0 # gpu number for processing
 
 # Model process variables
-model=./models/logic_llama_2_13b_Q5_K_M.gguf
+model=./models/Hermes-2-Pro-Llama-3-8B-Q6_K.gguf
 n_gpu_layers=51 # (51 max for current model) you must set the optimal option if you will be replacing the default model
 ctx_size=2048
 #ctx_size=4096

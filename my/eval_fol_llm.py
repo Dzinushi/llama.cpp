@@ -6,6 +6,7 @@ from tqdm import tqdm
 import json
 from typing import List, Dict, Any, Union
 from dataclasses import dataclass
+from utils import prompt_end_filter
 
 
 def mean(data: List) -> float:
@@ -29,8 +30,7 @@ class TestLLMTerminal(TestLLM):
             user_input = input("User: ")
             response = simple_api_server(prompt_fn(instruction=instruction, user_input=user_input))
             llm_fol = response["content"]
-            if filter_prompt_end is not None:
-                llm_fol = llm_fol[:llm_fol.find(filter_prompt_end)]
+            prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
             if use_correct_fol:
                 # llm_fol: "∃x (Person(x) ∧ Sees(x, John))"
                 # correct_fol: "∃x (I(x) → Sees(x, John))"
@@ -64,8 +64,7 @@ class TestLLMCSV(TestLLM):
             for index, row in df.iterrows():
                 text = row[text_column]
                 llm_fol = simple_api_server(prompt_fn(instruction=instruction, user_input=text))["content"]
-                if filter_prompt_end is not None:
-                    llm_fol = llm_fol[:llm_fol.find(filter_prompt_end)]
+                prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
                 if correct_fol_column is not None:
                     correct_fol = row[correct_fol_column]
                     res = self.metrics.evaluate(None, correct_fol, None, llm_fol)
@@ -146,6 +145,7 @@ class TestLLMMALL(TestLLM):
                  llm_pattern_name: str,
                  instruction: str,
                  temp_save_file_path: str,
+                 filter_prompt_end: str = None,
                  continue_process: bool = False,
                  separator: str = ":") -> Dict[str, Union[str, float]]:
         """
@@ -168,13 +168,14 @@ class TestLLMMALL(TestLLM):
             data_dict = self._restore_from_temp_file(filepath=temp_save_file_path, separator=separator)
             skip_count = len(data_dict[tfs.NL])
             print(f"Continue from {skip_count} row")
-        with tqdm(total=len(data)) as pb:
+        with tqdm(total=len(data), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}') as pb:
             pb.update(skip_count)
             with open(temp_save_file_path, "a+") as temp_f:
                 for item in data[skip_count:]:
                     text = item["NL"]
                     correct_fol = item["FOL"]
                     llm_fol = simple_server_api(prompt_fn(instruction=instruction, user_input=text))["content"]
+                    prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
                     res = self.metrics.evaluate(None, correct_fol, None, llm_fol)
                     bleu, le = res.FOL_bleu, res.FOL_LE
                     data_dict[tfs.NL].append(text)

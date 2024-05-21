@@ -11,6 +11,7 @@ INSTRUCTION_FOL = ("Translate the following natural language (NL) statement to a
 INSTRUCTION_FOL_LOGIC_LLAMA = ("Translate the following natural language (NL) statement "
                                "to a first-order logic (FOL) rule")
 
+
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument("--path_to_test", type=str)
@@ -18,6 +19,7 @@ def parse_args():
     parser.add_argument("--llm_pattern_name", type=str, default="hermes")
     parser.add_argument("--instruction", type=str, default=INSTRUCTION_FOL)
     parser.add_argument("--temp_save_file_path", type=str)
+    parser.add_argument("--filter_prompt_end", type=str, default=None)
     parser.add_argument("--continue_process", type=str_to_bool)
     parser.add_argument("--json_save_file_path", type=str)
     return parser.parse_args()
@@ -30,6 +32,7 @@ if __name__ == '__main__':
         path_to_test=args.path_to_test,
         llm_pattern_name=args.llm_pattern_name,
         instruction=args.instruction,
+        filter_prompt_end=args.filter_prompt_end,
         temp_save_file_path=args.temp_save_file_path,
         continue_process=args.continue_process
     )
