@@ -39,4 +39,4 @@ if __name__ == '__main__':
         delimiter=args.delimiter,
         filter_prompt_end=args.filter_prompt_end
     )
-    df.to_csv(path_or_buf=args.save_path, index=False)
+    df.to_csv(path_or_buf=args.save_path, sep=args.delimiter)
