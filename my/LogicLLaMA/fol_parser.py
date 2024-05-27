@@ -14,9 +14,9 @@ from Levenshtein import distance as edit_dist
 
 
 # TODO inefficient
-op_ls = ['⊕', '∨', '∧', '→', '↔', '∀', '∃', '¬', '(', ')', ',']
+op_ls = ["⊕", "∨", "∧", "→", "↔", "∀", "∃", "¬", "(", ")", ","]
 
-sym_reg = re.compile(r'[^⊕∨∧→↔∀∃¬(),]+')
+sym_reg = re.compile(r"[^⊕∨∧→↔∀∃¬(),]+")
 
 cfg_template = """
 S -> F | Q F
@@ -30,17 +30,18 @@ QUANT -> '∀' | '∃'
 """
 
 # used in perturbation
-last_nt_nodes = set(['PRED', 'OP', 'CONST', 'VAR', 'QUANT'])
+last_nt_nodes = set(["PRED", "OP", "CONST", "VAR", "QUANT"])
 # used in node insertion
-insertable_nt_nodes = set(['Q', 'S', 'TERMS', 'F'])
+insertable_nt_nodes = set(["Q", "S", "TERMS", "F"])
 # used in node deletion
-deleteable_nt_nodes = set(['Q', 'TERMS', 'F', 'L'])
+deleteable_nt_nodes = set(["Q", "TERMS", "F", "L"])
+
 
 def parse_text_FOL_to_tree(rule_str):
     """
-        Parse a text FOL rule into nltk.tree
+    Parse a text FOL rule into nltk.tree
 
-        Returns: nltk.tree, or None if the parse fails
+    Returns: nltk.tree, or None if the parse fails
     """
     rule_str = reorder_quantifiers(rule_str)
 
@@ -55,19 +56,19 @@ def parse_text_FOL_to_tree(rule_str):
 
 
 def reorder_quantifiers(rule_str):
-    matches = re.findall(r'[∃∀]\w', rule_str)
+    matches = re.findall(r"[∃∀]\w", rule_str)
     for match in matches[::-1]:
-        rule_str = '%s ' % match + rule_str.replace(match, '', 1)
+        rule_str = "%s " % match + rule_str.replace(match, "", 1)
     return rule_str
 
 
 def msplit(s):
     for op in op_ls:
-        s = s.replace(op, ' %s ' % op)
+        s = s.replace(op, " %s " % op)
     r = [e.strip() for e in s.split()]
-    #remove ' from the string if it contains any: this causes error in nltk cfg parsing
-    r = [e.replace('\'', '') for e in r]
-    r = [e for e in r if e != '']
+    # remove ' from the string if it contains any: this causes error in nltk cfg parsing
+    r = [e.replace("'", "") for e in r]
+    r = [e for e in r if e != ""]
 
     # deal with symbols with spaces like "dc universe" and turn it to "DcUniverse"
     res = []
@@ -77,30 +78,30 @@ def msplit(s):
             cur_str_ls.append(e[0].upper() + e[1:])
         else:
             if len(cur_str_ls) > 0:
-                res.extend([''.join(cur_str_ls), e])
+                res.extend(["".join(cur_str_ls), e])
             else:
                 res.extend([e])
             cur_str_ls = []
     if len(cur_str_ls) > 0:
-        res.append(''.join(cur_str_ls))
+        res.append("".join(cur_str_ls))
 
     # re-generate the FOL string
     make_str_ls = []
     for ind, e in enumerate(r):
-        if re.match(r'[⊕∨∧→↔]', e):
-            make_str_ls.append(' %s ' % e)
-        elif re.match(r',', e):
-            make_str_ls.append('%s ' % e)
+        if re.match(r"[⊕∨∧→↔]", e):
+            make_str_ls.append(" %s " % e)
+        elif re.match(r",", e):
+            make_str_ls.append("%s " % e)
         # a logical variable
-        elif (len(e) == 1) and re.match(r'\w', e):
-            if ((ind - 1) >= 0) and ((r[ind-1] == '∃') or (r[ind-1] == '∀')):
-                make_str_ls.append('%s ' % e)
+        elif (len(e) == 1) and re.match(r"\w", e):
+            if ((ind - 1) >= 0) and ((r[ind - 1] == "∃") or (r[ind - 1] == "∀")):
+                make_str_ls.append("%s " % e)
             else:
                 make_str_ls.append(e)
         else:
             make_str_ls.append(e)
 
-    return res, ''.join(make_str_ls)
+    return res, "".join(make_str_ls)
 
 
 def make_cfg_str(token_ls):
@@ -110,19 +111,19 @@ def make_cfg_str(token_ls):
     parsered, we then go back and figure out the exact type of each symbols
     """
     sym_ls = list(set([e for e in token_ls if sym_reg.match(e)]))
-    sym_str = ' | '.join(["'%s'" % s for s in sym_ls])
-    cfg_str = cfg_template + 'VAR -> %s\nPRED -> %s\nCONST -> %s' % (sym_str,sym_str,sym_str)
+    sym_str = " | ".join(["'%s'" % s for s in sym_ls])
+    cfg_str = cfg_template + "VAR -> %s\nPRED -> %s\nCONST -> %s" % (sym_str, sym_str, sym_str)
     return cfg_str
 
 
 def symbol_resolution(tree):
     lvars, consts, preds = set(), set(), set()
 
-    if tree[0].label() == 'Q':
+    if tree[0].label() == "Q":
         isFOL = True
         main_tree = tree[1]
         for sym, tag in tree[0].pos():
-            if tag == 'VAR':
+            if tag == "VAR":
                 lvars.add(sym)
     else:
         isFOL = False
@@ -138,16 +139,16 @@ def preorder_resolution(tree, lvars, consts, preds):
     if isinstance(tree, str):
         return
 
-    if tree.label() == 'PRED':
+    if tree.label() == "PRED":
         preds.add(tree[0])
         return
 
-    if tree.label() == 'TERM':
+    if tree.label() == "TERM":
         sym = tree[0][0]
         if sym in lvars:
-            tree[0].set_label('VAR')
+            tree[0].set_label("VAR")
         else:
-            tree[0].set_label('CONST')
+            tree[0].set_label("CONST")
             consts.add(sym)
         return
 
@@ -165,17 +166,10 @@ class Rule:
 
     def rule_str(self):
         # TODO inefficient
-        _, rule_str = msplit(''.join(self.tree.leaves()))
+        _, rule_str = msplit("".join(self.tree.leaves()))
         return rule_str
 
-    def _get_nodes(
-            self,
-            root,
-            nodes,
-            allowed_labels=None,
-            not_allowed_nodes=None,
-            not_allowed_nodes_in_subtree=False
-    ):
+    def _get_nodes(self, root, nodes, allowed_labels=None, not_allowed_nodes=None, not_allowed_nodes_in_subtree=False):
         all_child_allowed = True
 
         if isinstance(root, str):
@@ -184,11 +178,7 @@ class Rule:
         # post-order check children
         for child in root:
             child_allowed = self._get_nodes(
-                child,
-                nodes,
-                allowed_labels,
-                not_allowed_nodes,
-                not_allowed_nodes_in_subtree
+                child, nodes, allowed_labels, not_allowed_nodes, not_allowed_nodes_in_subtree
             )
             all_child_allowed = all_child_allowed and child_allowed
         # this is twisted... what i mean is that if you don't want to filter the subtrees then simply set
@@ -199,52 +189,33 @@ class Rule:
         root_is_allowed = (not_allowed_nodes is None) or all(e is not root for e in not_allowed_nodes)
         tree_is_allowed = all_child_allowed and root_is_allowed
 
-        if (
-                ((allowed_labels is None) or (root.label() in allowed_labels))
-                and tree_is_allowed
-        ):
+        if ((allowed_labels is None) or (root.label() in allowed_labels)) and tree_is_allowed:
             nodes.append(root)
 
         return tree_is_allowed
 
-    def get_nodes(
-            self,
-            root,
-            allowed_labels=None,
-            not_allowed_nodes=None,
-            not_allowed_nodes_in_subtree=False
-    ):
+    def get_nodes(self, root, allowed_labels=None, not_allowed_nodes=None, not_allowed_nodes_in_subtree=False):
         """
-            get tree nodes from a tree
+        get tree nodes from a tree
 
-            Args:
-                root:
-                allowed_labels: None or a set of strs; only nodes with the allowed label is included
-                not_allowed_nodes: None or a list of node objects; only node objects that are not in the list
-                is included
-                not_allowed_nodes_in_subtree: set to True to also filter out nodes whose subtree nodes are in
-                not_allowed_nodes, this is used when finding the deletable nodes (we want to find nodes whose entire
-                subtree is not perturbed before)
+        Args:
+            root:
+            allowed_labels: None or a set of strs; only nodes with the allowed label is included
+            not_allowed_nodes: None or a list of node objects; only node objects that are not in the list
+            is included
+            not_allowed_nodes_in_subtree: set to True to also filter out nodes whose subtree nodes are in
+            not_allowed_nodes, this is used when finding the deletable nodes (we want to find nodes whose entire
+            subtree is not perturbed before)
         """
         if not_allowed_nodes_in_subtree:
-            assert all_exists(not_allowed_nodes), 'must specify not_allowed_nodes'
+            assert all_exists(not_allowed_nodes), "must specify not_allowed_nodes"
 
         nodes = []
-        self._get_nodes(
-            root,
-            nodes,
-            allowed_labels,
-            not_allowed_nodes,
-            not_allowed_nodes_in_subtree
-        )
+        self._get_nodes(root, nodes, allowed_labels, not_allowed_nodes, not_allowed_nodes_in_subtree)
         return nodes
 
     def random_node_by_label(
-            self,
-            root,
-            allowed_labels=None,
-            not_allowed_nodes=None,
-            not_allowed_nodes_in_subtree=False
+        self, root, allowed_labels=None, not_allowed_nodes=None, not_allowed_nodes_in_subtree=False
     ):
         nodes = self.get_nodes(root, allowed_labels, not_allowed_nodes, not_allowed_nodes_in_subtree)
         choice = nodes[int(np.random.randint(len(nodes)))] if len(nodes) > 0 else None
@@ -254,7 +225,7 @@ class Rule:
         if isinstance(root, str):
             return
 
-        if root.label() == 'F':
+        if root.label() == "F":
             if len(root) == 3 and all(not isinstance(child, str) for child in root):
                 # this is a F - F OP F subtree
                 res.append(root)
@@ -303,12 +274,12 @@ class Sample:
         self.rule = rule
         self.perturbed_rule = None
 
-        word_reg = re.compile(r'^\w+$')
+        word_reg = re.compile(r"^\w+$")
         nl_words = [e.strip().lower() for e in self.nl.split()]
         nl_words = [e for e in nl_words if word_reg.match(e) is not None]
 
         self.symbols = list(self.rule.lvars) + list(self.rule.consts) + list(self.rule.preds) + nl_words
-        assert len(self.symbols) > 1, 'to avoid dead loop; maybe improve later'
+        assert len(self.symbols) > 1, "to avoid dead loop; maybe improve later"
 
     @classmethod
     def get_changeable_nodes(cls, rule: Rule, occupied_nodes):
@@ -316,16 +287,13 @@ class Sample:
             rule.tree,
             allowed_labels=last_nt_nodes,
             not_allowed_nodes=occupied_nodes,
-            not_allowed_nodes_in_subtree=False
+            not_allowed_nodes_in_subtree=False,
         )
 
     @classmethod
     def get_insertable_nodes(cls, rule: Rule):
         return rule.get_nodes(
-            rule.tree,
-            allowed_labels=insertable_nt_nodes,
-            not_allowed_nodes=None,
-            not_allowed_nodes_in_subtree=False
+            rule.tree, allowed_labels=insertable_nt_nodes, not_allowed_nodes=None, not_allowed_nodes_in_subtree=False
         )
 
     @classmethod
@@ -336,28 +304,28 @@ class Sample:
             rule.tree,
             allowed_labels=deleteable_nt_nodes,
             not_allowed_nodes=occupied_nodes,
-            not_allowed_nodes_in_subtree=False
+            not_allowed_nodes_in_subtree=False,
         )
 
         deletable_nodes = []
         for node in nodes:
             label = node.label()
 
-            if label == 'Q':
+            if label == "Q":
                 # a Q node whose direct QUANT and VAR children are not occupied is deletable
                 if has_same_obj_in_list(node[0], occupied_nodes) or has_same_obj_in_list(node[1], occupied_nodes):
                     continue
 
-            elif label == 'TERMS':
+            elif label == "TERMS":
                 # only TERMS node with a TERMS parent is deletable
                 parent = rule.parent_of(rule.tree, node)
-                if parent.label() != 'TERMS':
+                if parent.label() != "TERMS":
                     continue
                 # only TERMS node with unoccupied direct TERM and VAR child is deletable
                 if has_same_obj_in_list(node[0], occupied_nodes) or has_same_obj_in_list(node[0][0], occupied_nodes):
                     continue
 
-            elif label == 'F':
+            elif label == "F":
                 # only F node with siblings of F OP F is deletable
                 parent = rule.parent_of(rule.tree, node)
                 if len(parent) != 3:
@@ -366,11 +334,7 @@ class Sample:
                     continue
                 if isinstance(parent[2], str):
                     continue
-                if not (
-                        parent[0].label() == 'F'
-                        and parent[1].label() == 'OP'
-                        and parent[2].label() == 'F'
-                ):
+                if not (parent[0].label() == "F" and parent[1].label() == "OP" and parent[2].label() == "F"):
                     continue
                 # only F node with an entire unoccupied tree is deletable
                 # I check this by checking if this F node is in the unoccupied_nodes while
@@ -379,7 +343,7 @@ class Sample:
                     node,
                     allowed_labels=deleteable_nt_nodes,
                     not_allowed_nodes=occupied_nodes,
-                    not_allowed_nodes_in_subtree=True
+                    not_allowed_nodes_in_subtree=True,
                 )
                 if not has_same_obj_in_list(node, unoccupied_nodes):
                     continue
@@ -394,22 +358,21 @@ class Sample:
         for node in nodes:
             label = node.label()
             # only F/L node has a deletable negation if it has negation in it
-            if (label == 'F') or (label == 'L'):
-                if isinstance(node[0], str) and (node[0] == '¬'):
+            if (label == "F") or (label == "L"):
+                if isinstance(node[0], str) and (node[0] == "¬"):
                     nodes_with_deletable_negation.append(node)
 
         # combine the possible deletions and assign a mode tag
-        deletable_nodes = \
-            [(e, 'delete_node') for e in deletable_nodes] \
-            + [(e, 'delete_negation') for e in nodes_with_deletable_negation]
+        deletable_nodes = [(e, "delete_node") for e in deletable_nodes] + [
+            (e, "delete_negation") for e in nodes_with_deletable_negation
+        ]
 
         return deletable_nodes
 
 
-
 class VecRuleEvaluator:
 
-    dummy_input_str: str = '#DUMMY'
+    dummy_input_str: str = "#DUMMY"
     dummy_distance: int = 10000
 
     @classmethod
@@ -421,9 +384,9 @@ class VecRuleEvaluator:
     @classmethod
     def enumerate_bindings_with_greedy_match(cls, ls1: List[str], ls2: List[str], top_n: int):
         """
-            Given two lists of strings ls1 and ls2, yields the ind bindings of ls2 strings that matches the strings in
-            ls1. I use greedy match and yields starts from the best to the worst binding until full enumeration or hit
-            the top_n bound
+        Given two lists of strings ls1 and ls2, yields the ind bindings of ls2 strings that matches the strings in
+        ls1. I use greedy match and yields starts from the best to the worst binding until full enumeration or hit
+        the top_n bound
         """
 
         used_inds = []
@@ -434,13 +397,12 @@ class VecRuleEvaluator:
                 return
             e1 = ls1[ind1]
             match_ls = [
-                (ind, cls.default_input_similarity(e1, e2))
-                for ind, e2 in enumerate(ls2) if ind not in used_inds
+                (ind, cls.default_input_similarity(e1, e2)) for ind, e2 in enumerate(ls2) if ind not in used_inds
             ]
-            match_ls.sort(key=lambda x:x[1])
+            match_ls.sort(key=lambda x: x[1])
             for ind, dist in match_ls:
                 used_inds.append(ind)
-                for inds in _enum_bindings(ind1+1):
+                for inds in _enum_bindings(ind1 + 1):
                     yield inds
                 used_inds.pop()
 
@@ -456,9 +418,9 @@ class VecRuleEvaluator:
 
         label = root.label()
 
-        if label == 'L':
-            literal_str = ''.join(root.leaves())
-            literal_str = literal_str[1:] if literal_str[0] == '¬' else literal_str
+        if label == "L":
+            literal_str = "".join(root.leaves())
+            literal_str = literal_str[1:] if literal_str[0] == "¬" else literal_str
             if input_set is None:
                 input_set = set()
             input_set.add(literal_str)
@@ -470,27 +432,26 @@ class VecRuleEvaluator:
     def gen_input_vecs(cls, num_inputs):
         return np.array(list(product([False, True], repeat=num_inputs)))
 
-
     @classmethod
     def from_nltk_tree(cls, root, name2ind_dict, input_vecs):
-        assert not isinstance(root, str), 'something wrong with the rule or the algo; you should not parse a leave'
+        assert not isinstance(root, str), "something wrong with the rule or the algo; you should not parse a leave"
 
         label = root.label()
 
-        if label == 'S':
+        if label == "S":
 
             return cls.from_nltk_tree(root[-1], name2ind_dict, input_vecs)
 
-        elif label == 'F':
+        elif label == "F":
 
             # the case F -> L
-            if (len(root) == 1) and (root[0].label() == 'L'):
+            if (len(root) == 1) and (root[0].label() == "L"):
                 return cls.from_nltk_tree(root[0], name2ind_dict, input_vecs)
 
             # the case F -> '¬' '(' F ')' | (' F ')'
-            elif root[-2].label() == 'F':
+            elif root[-2].label() == "F":
 
-                isnegated_rule = isinstance(root[0], str) and (root[0] == '¬')
+                isnegated_rule = isinstance(root[0], str) and (root[0] == "¬")
                 res = cls.from_nltk_tree(root[-2], name2ind_dict, input_vecs)
 
                 if isnegated_rule:
@@ -499,30 +460,31 @@ class VecRuleEvaluator:
                 return res
 
             # the case F -> F OP F
-            elif root[-2].label() == 'OP':
+            elif root[-2].label() == "OP":
 
-                p, q = cls.from_nltk_tree(root[0], name2ind_dict, input_vecs), \
-                       cls.from_nltk_tree(root[-1], name2ind_dict, input_vecs)
+                p, q = cls.from_nltk_tree(root[0], name2ind_dict, input_vecs), cls.from_nltk_tree(
+                    root[-1], name2ind_dict, input_vecs
+                )
 
                 op = root[1][0]
-                if op == '⊕':
+                if op == "⊕":
                     return np.logical_xor(p, q)
-                elif op == '∨':
+                elif op == "∨":
                     return np.logical_or(p, q)
-                elif op == '∧':
+                elif op == "∧":
                     return np.logical_and(p, q)
-                elif op == '→':
+                elif op == "→":
                     return np.logical_or(~p, q)
-                elif op == '↔':
+                elif op == "↔":
                     return np.logical_or(np.logical_and(p, q), np.logical_and(~p, ~q))
                 else:
                     raise ValueError
 
-        elif label == 'L':
+        elif label == "L":
 
-            isnegated_literal = isinstance(root[0], str) and (root[0] == '¬')
+            isnegated_literal = isinstance(root[0], str) and (root[0] == "¬")
 
-            literal_str = ''.join(root.leaves())
+            literal_str = "".join(root.leaves())
             # remove the possible negation at the beginning
             literal_str = literal_str[1:] if isnegated_literal else literal_str
 
@@ -538,17 +500,11 @@ class VecRuleEvaluator:
 
     @classmethod
     def find_best_LE_score(
-            cls,
-            true_root,
-            pred_root,
-            soft_binding: bool,
-            greedy_match: bool,
-            top_n: int,
-            verbose: bool = False
+        cls, true_root, pred_root, soft_binding: bool, greedy_match: bool, top_n: int, verbose: bool = False
     ):
         """
-            Given the groundtruth and the predicted nltk FOL trees, compute the truth tables over all
-            literal bindings and returns the best one
+        Given the groundtruth and the predicted nltk FOL trees, compute the truth tables over all
+        literal bindings and returns the best one
         """
 
         # first we find "inputs" in each tree, i.e. the set of unique literals in a FOL
@@ -558,7 +514,7 @@ class VecRuleEvaluator:
         n_true_inputs, n_pred_inputs = len(true_inputs), len(pred_inputs)
         min_n, max_n = sorted([n_true_inputs, n_pred_inputs])
 
-        best_score, best_binded_pred_inputs = 0., None
+        best_score, best_binded_pred_inputs = 0.0, None
 
         # once we found the inputs, then we deal with the case where # inputs in two trees are different
         # either we do soft binding by adding dummy inputs to the shorter ones, or we simply return 0
@@ -566,19 +522,21 @@ class VecRuleEvaluator:
             if soft_binding:
                 # extend the shorter inputs to the max number of inputs by adding dummy input names
                 ls_to_extend = true_inputs if n_true_inputs < max_n else pred_inputs
-                ls_to_extend.extend([f'{cls.dummy_input_str}_{ind}' for ind in range(max_n-min_n)])
+                ls_to_extend.extend([f"{cls.dummy_input_str}_{ind}" for ind in range(max_n - min_n)])
             else:
                 return best_score, true_inputs, best_binded_pred_inputs
 
         # at this point, we have two list ofs inputs of the same length and we will find the input binding that yields
         # the best score
         input_vecs = VecRuleEvaluator.gen_input_vecs(len(true_inputs))
-        true_name2ind_dict = dict((e, ind) for ind,e in enumerate(true_inputs))
+        true_name2ind_dict = dict((e, ind) for ind, e in enumerate(true_inputs))
         true_res_vec = VecRuleEvaluator.from_nltk_tree(true_root, true_name2ind_dict, input_vecs)
 
-        ind_binding_enumerator = \
-            cls.enumerate_bindings_with_greedy_match(true_inputs, pred_inputs, top_n) if greedy_match \
+        ind_binding_enumerator = (
+            cls.enumerate_bindings_with_greedy_match(true_inputs, pred_inputs, top_n)
+            if greedy_match
             else permutations(list(range(max_n)))
+        )
 
         for cnt_ind, binded_pred_inputs_inds in enumerate(ind_binding_enumerator):
             binded_pred_inputs = [pred_inputs[ind] for ind in binded_pred_inputs_inds]
@@ -587,9 +545,7 @@ class VecRuleEvaluator:
             score = (pred_res_vec == true_res_vec).mean(dtype=np.float32).item()
 
             if verbose:
-                print('{0}\n{1}\n{2}\n---\n'.format(
-                    score, true_inputs, binded_pred_inputs)
-                )
+                print("{0}\n{1}\n{2}\n---\n".format(score, true_inputs, binded_pred_inputs))
 
             if score > best_score:
                 best_score = score

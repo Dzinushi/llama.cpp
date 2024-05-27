@@ -2,12 +2,15 @@ from eval_fol_llm import TestLLMCSV
 from argparse import ArgumentParser
 
 
-INSTRUCTION_FOL = ("Translate the following natural language (NL) statement to a first-order logic (FOL) rule. "
-                   "The answer should only contain a sentence in FOL, no other text. "
-                   "Never abbreviate words when translating text into FOL.")
+INSTRUCTION_FOL = (
+    "Translate the following natural language (NL) statement to a first-order logic (FOL) rule. "
+    "The answer should only contain a sentence in FOL, no other text. "
+    "Never abbreviate words when translating text into FOL."
+)
 
-INSTRUCTION_FOL_LOGIC_LLAMA = ("Translate the following natural language (NL) statement "
-                               "to a first-order logic (FOL) rule")
+INSTRUCTION_FOL_LOGIC_LLAMA = (
+    "Translate the following natural language (NL) statement " "to a first-order logic (FOL) rule"
+)
 
 
 def parse_csv_args():
@@ -25,7 +28,7 @@ def parse_csv_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = parse_csv_args()
     test_llm = TestLLMCSV()
     df = test_llm(
@@ -37,6 +40,6 @@ if __name__ == '__main__':
         correct_fol_column=args.correct_fol_column,
         index_column=args.index_column,
         delimiter=args.delimiter,
-        filter_prompt_end=args.filter_prompt_end
+        filter_prompt_end=args.filter_prompt_end,
     )
     df.to_csv(path_or_buf=args.save_path, sep=args.delimiter)

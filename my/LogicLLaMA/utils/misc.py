@@ -37,8 +37,9 @@ def wrap_function_with_timeout(func: Callable, timeout: int):
 
     return wrapped_function
 
-def make_parent_dirs(fp:str):
-    parts = fp.split('/')
+
+def make_parent_dirs(fp: str):
+    parts = fp.split("/")
     if len(parts) == 1:
         return
 

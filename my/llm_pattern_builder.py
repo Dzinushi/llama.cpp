@@ -11,24 +11,21 @@ class PromptPatternBase(ABC):
 class HermesPromptPattern(PromptPatternBase):
     @staticmethod
     def prompt(user_input: str, instruction: str = "") -> str:
-        return (f"<|im_start|>system\n{instruction}<|im_end|>\n"
-                f"<|im_start|>user\n{user_input}<|im_end|>\n"
-                f"<|im_start|>assistant\n")
+        return (
+            f"<|im_start|>system\n{instruction}<|im_end|>\n"
+            f"<|im_start|>user\n{user_input}<|im_end|>\n"
+            f"<|im_start|>assistant\n"
+        )
 
 
 class LogicLLaMAPattern(PromptPatternBase):
     @staticmethod
     def prompt(user_input: str, instruction: str = ""):
-        return (f"### Instruction: {instruction}\n"
-                f"### NL: {user_input}\n"
-                f"### FOL: ")
+        return f"### Instruction: {instruction}\n" f"### NL: {user_input}\n" f"### FOL: "
 
 
 class PromptPatternBuilder:
-    pattern_map = {
-        "hermes": HermesPromptPattern.prompt,
-        "logic_llama": LogicLLaMAPattern.prompt
-    }
+    pattern_map = {"hermes": HermesPromptPattern.prompt, "logic_llama": LogicLLaMAPattern.prompt}
 
     @staticmethod
     def create(name: str) -> Callable:

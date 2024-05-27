@@ -4,5 +4,5 @@ from .data_prep import (
     TranslationDataPreparer,
     CorrectionDataPreparer,
     DataPreparer,
-    ContinuousCorrectionDataPreparer
+    ContinuousCorrectionDataPreparer,
 )

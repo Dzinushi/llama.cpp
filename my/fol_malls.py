@@ -5,12 +5,15 @@ from utils import str_to_bool
 import pandas as pd
 
 
-INSTRUCTION_FOL = ("Translate the following natural language (NL) statement to a first-order logic (FOL) rule. "
-                   "The answer should only contain a sentence in FOL, no other text. "
-                   "Never abbreviate words when translating text into FOL.")
+INSTRUCTION_FOL = (
+    "Translate the following natural language (NL) statement to a first-order logic (FOL) rule. "
+    "The answer should only contain a sentence in FOL, no other text. "
+    "Never abbreviate words when translating text into FOL."
+)
 
-INSTRUCTION_FOL_LOGIC_LLAMA = ("Translate the following natural language (NL) statement "
-                               "to a first-order logic (FOL) rule")
+INSTRUCTION_FOL_LOGIC_LLAMA = (
+    "Translate the following natural language (NL) statement " "to a first-order logic (FOL) rule"
+)
 
 
 def parse_args():
@@ -27,7 +30,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test_llm = TestLLMMALL()
     args = parse_args()
     result_json = test_llm(
@@ -36,7 +39,7 @@ if __name__ == '__main__':
         instruction=args.instruction,
         filter_prompt_end=args.filter_prompt_end,
         temp_save_file_path=args.temp_save_file_path,
-        continue_process=args.continue_process
+        continue_process=args.continue_process,
     )
     # with open(args.json_save_file_path, "w") as f:
     #     json.dump(result_json, f)

@@ -10,8 +10,7 @@ from functools import partial
 from tqdm import tqdm
 
 
-folio_5_shot = \
-"""
+folio_5_shot = """
 
 Here are some examples you can refer to:
 
@@ -60,8 +59,7 @@ N/A
 ---
 """
 
-logicnli_5_shot = \
-"""
+logicnli_5_shot = """
 
 Here are some examples you can refer to:
 
@@ -103,8 +101,7 @@ N/A
 ---
 """
 
-translate_system_prompt_5_shot = \
-"""
+translate_system_prompt_5_shot = """
 You are a helpful translator that translates natural language (NL) statements into first-order 
 logic (FOL) rules. You should
 1. Generate the FOL rule that ACCURATELY reflect the meaning of the NL statement
@@ -123,9 +120,7 @@ N/A
 """
 
 
-
-translate_system_prompt_zero_shot = \
-"""
+translate_system_prompt_zero_shot = """
 You are a helpful translator that translates natural language (NL) statements into first-order 
 logic (FOL) rules. You should
 1. Generate the FOL rule that ACCURATELY reflect the meaning of the NL statement
@@ -144,8 +139,7 @@ N/A
 """
 
 
-fix_prompt = \
-"""
+fix_prompt = """
 ---
 
 Below is one suggestion on how to modify this rule to match the meaning of NL, you SHOULD EITHER:
@@ -171,27 +165,27 @@ Suggestion:
 
 class GPTTranslationRequestManager:
 
-    model_gpt4: str = 'gpt-4'
-    model_gpt35: str = 'gpt-3.5-turbo'
+    model_gpt4: str = "gpt-4"
+    model_gpt35: str = "gpt-3.5-turbo"
 
     def __init__(self, api_key: str):
         """
-            Args:
-                api_key: either the key string or the path to the key file
+        Args:
+            api_key: either the key string or the path to the key file
         """
         if os.path.isfile(api_key):
-            with open(api_key, 'r') as f:
+            with open(api_key, "r") as f:
                 openai.api_key = f.read().strip()
         else:
             openai.api_key = api_key
 
     def default_request(
-            self,
-            input_prompt: str,
-            system_prompt: str,
-            model: str,
-            resp_split_func: Optional[Callable] = None,
-            tqdm: Optional[Callable] = None
+        self,
+        input_prompt: str,
+        system_prompt: str,
+        model: str,
+        resp_split_func: Optional[Callable] = None,
+        tqdm: Optional[Callable] = None,
     ):
         logger = tqdm.write if all_exists(tqdm) else print
         assert model == GPTTranslationRequestManager.model_gpt35 or model == GPTTranslationRequestManager.model_gpt4
@@ -201,11 +195,11 @@ class GPTTranslationRequestManager:
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": input_prompt},
-                ]
+                ],
             )
-            resp_str = response['choices'][0]['message']['content']
+            resp_str = response["choices"][0]["message"]["content"]
         except:
-            logger('something wrong with the request')
+            logger("something wrong with the request")
             return None
 
         if all_exists(resp_split_func):
@@ -214,20 +208,20 @@ class GPTTranslationRequestManager:
         return resp_str
 
     def translate_dataset(
-            self,
-            dataset: Union[str, Dict, List],
-            resp_key: str,
-            timeout: int = 10,
-            resp_split_func: Optional[Callable] = None,
-            n_retry: int = 3,
-            tqdm: Optional[Callable] = None,
-            verbose: bool = False,
-            save_path: str = None,
-            model: str = 'gpt-3.5-turbo',
-            zero_shot: bool = False,
-            few_shot_src: Optional[str] = 'folio',
-            save_every_nrequests: int = 10,
-            src: Optional[str] = None,
+        self,
+        dataset: Union[str, Dict, List],
+        resp_key: str,
+        timeout: int = 10,
+        resp_split_func: Optional[Callable] = None,
+        n_retry: int = 3,
+        tqdm: Optional[Callable] = None,
+        verbose: bool = False,
+        save_path: str = None,
+        model: str = "gpt-3.5-turbo",
+        zero_shot: bool = False,
+        few_shot_src: Optional[str] = "folio",
+        save_every_nrequests: int = 10,
+        src: Optional[str] = None,
     ):
 
         request_with_timeout = wrap_function_with_timeout(self.default_request, timeout)
@@ -236,22 +230,22 @@ class GPTTranslationRequestManager:
             translate_system_prompt = translate_system_prompt_zero_shot
         else:
             assert all_exists(few_shot_src)
-            if few_shot_src == 'folio':
+            if few_shot_src == "folio":
                 few_shot_example = folio_5_shot
-            elif few_shot_src == 'logicnli':
+            elif few_shot_src == "logicnli":
                 few_shot_example = logicnli_5_shot
             else:
                 raise ValueError(few_shot_src)
             translate_system_prompt = translate_system_prompt_5_shot + few_shot_example
 
         if isinstance(dataset, str):
-            assert os.path.isfile(dataset) and dataset.endswith('json')
-            with open(dataset, 'r') as f:
+            assert os.path.isfile(dataset) and dataset.endswith("json")
+            with open(dataset, "r") as f:
                 dataset = json.load(f)
 
         if isinstance(dataset, Dict):
-            assert 'data' in dataset, 'unknown format'
-            dataset = dataset['data']
+            assert "data" in dataset, "unknown format"
+            dataset = dataset["data"]
 
         assert isinstance(dataset, List)
 
@@ -263,7 +257,7 @@ class GPTTranslationRequestManager:
         update_bar = pbar.update if all_exists(tqdm) else lambda: None
 
         for ind, entry in enumerate(dataset):
-            src_is_valid = (src is None) or (all_exists(src) and entry['src'] == src)
+            src_is_valid = (src is None) or (all_exists(src) and entry["src"] == src)
             resp_exists = (resp_key in entry) and all_exists(entry[resp_key])
             should_request = src_is_valid and (not resp_exists)
 
@@ -279,43 +273,36 @@ class GPTTranslationRequestManager:
                     break
 
             if resp is None:
-                logger(f'sample {ind} no response')
+                logger(f"sample {ind} no response")
 
-            entry[resp_key] = resp[1][1] if all_exists(resp) else None # put the parsed response here
-            entry[resp_key + '_full response'] = resp # also keep the orignal response here
+            entry[resp_key] = resp[1][1] if all_exists(resp) else None  # put the parsed response here
+            entry[resp_key + "_full response"] = resp  # also keep the orignal response here
 
             if verbose:
-                logger('NL: {0}\nGT FOL: {1}\nGPT FOL:{2}\n---\n'.format(
-                    entry['NL'],
-                    entry['FOL'] if 'FOL' in entry else None,
-                    resp[1][1] if all_exists(resp) else None
-                ))
+                logger(
+                    "NL: {0}\nGT FOL: {1}\nGPT FOL:{2}\n---\n".format(
+                        entry["NL"], entry["FOL"] if "FOL" in entry else None, resp[1][1] if all_exists(resp) else None
+                    )
+                )
 
             if ind % save_every_nrequests == 0:
-                with open(save_path, 'w') as f:
+                with open(save_path, "w") as f:
                     json.dump(dataset, f)
 
             update_bar()
 
-        with open(save_path, 'w') as f:
+        with open(save_path, "w") as f:
             json.dump(dataset, f)
 
 
-def gpt_translation(
-    prompt_path='data/prompt_templates',
-    **kwargs
-):
+def gpt_translation(prompt_path="data/prompt_templates", **kwargs):
     prompter = Prompter(prompt_path)
-    resp_split_func = lambda full_str: prompter.get_response('translate_prompt_template', full_str)
-    manager = GPTTranslationRequestManager(kwargs['api_key'])
-    del kwargs['api_key']
+    resp_split_func = lambda full_str: prompter.get_response("translate_prompt_template", full_str)
+    manager = GPTTranslationRequestManager(kwargs["api_key"])
+    del kwargs["api_key"]
 
-    manager.translate_dataset(
-        resp_split_func=resp_split_func,
-        tqdm=tqdm,
-        **kwargs
-    )
+    manager.translate_dataset(resp_split_func=resp_split_func, tqdm=tqdm, **kwargs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     fire.Fire(gpt_translation)

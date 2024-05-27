@@ -23,7 +23,9 @@ class TestLLM:
 
 
 class TestLLMTerminal(TestLLM):
-    def __call__(self, llm_pattern_name: str, instruction: str = "", use_correct_fol: bool = False, filter_prompt_end: str = None):
+    def __call__(
+        self, llm_pattern_name: str, instruction: str = "", use_correct_fol: bool = False, filter_prompt_end: str = None
+    ):
         simple_api_server = LlamaServerSimpleAPI()
         prompt_fn = PromptPatternBuilder.create(llm_pattern_name)
         while True:
@@ -54,7 +56,7 @@ class TestLLMCSV(TestLLM):
         correct_fol_column: str = None,
         index_column: str = None,
         delimiter: str = ";",
-        filter_prompt_end: str = None
+        filter_prompt_end: str = None,
     ) -> pd.DataFrame:
         simple_api_server = LlamaServerSimpleAPI()
         prompt_fn = PromptPatternBuilder.create(llm_pattern_name)
@@ -107,9 +109,9 @@ class TestLLMMALL(TestLLM):
             find_prev = 0
             repeat = True
             while repeat:
-                for i in range(len(list_tfs)-1):
+                for i in range(len(list_tfs) - 1):
                     tag = list_tfs[i]
-                    next_tag = list_tfs[i+1]
+                    next_tag = list_tfs[i + 1]
                     left = data.find(f"{tag}{separator}", find_prev) + len(tag) + len(separator)
                     right = data.find(f"{next_tag}{separator}", left)
                     data_dict[tag].append(data[left:right])
@@ -117,12 +119,14 @@ class TestLLMMALL(TestLLM):
                 if data.find(f"{tfs.NL}{separator}", find_prev) == -1:
                     repeat = False
                     left, _ = self._next_left_right_data_dict(
-                        data=data, separator=f"{separator}", tag=tfs.LE, next_tag=tfs.NL, find_prev=find_prev)
+                        data=data, separator=f"{separator}", tag=tfs.LE, next_tag=tfs.NL, find_prev=find_prev
+                    )
                     right = len(data)
                 else:
                     left, right = self._next_left_right_data_dict(
-                        data=data, separator=f"{separator}", tag=tfs.LE, next_tag=tfs.NL, find_prev=find_prev)
-                data_dict[tfs.LE].append(data[left:right-1])
+                        data=data, separator=f"{separator}", tag=tfs.LE, next_tag=tfs.NL, find_prev=find_prev
+                    )
+                data_dict[tfs.LE].append(data[left : right - 1])
                 find_prev = left
             data_dict[tfs.BLEU] = [float(item) for item in data_dict[tfs.BLEU]]
             data_dict[tfs.LE] = [float(item) for item in data_dict[tfs.LE]]
@@ -134,22 +138,28 @@ class TestLLMMALL(TestLLM):
         right = data.find(f"{next_tag}{separator}", left)
         return left, right
 
-    def _write_to_temp_file(self, f, nl: str, fol: str, llm_fol: str, bleu: float, le: float, separator: str = ":") -> None:
+    def _write_to_temp_file(
+        self, f, nl: str, fol: str, llm_fol: str, bleu: float, le: float, separator: str = ":"
+    ) -> None:
         tfs = self.TempFileStructure
-        f.write(f"{tfs.NL}{separator}{nl}"
-                f"{tfs.FOL}{separator}{fol}"
-                f"{tfs.LLM_FOL}{separator}{llm_fol}"
-                f"{tfs.BLEU}{separator}{bleu}"
-                f"{tfs.LE}{separator}{le}\n")
+        f.write(
+            f"{tfs.NL}{separator}{nl}"
+            f"{tfs.FOL}{separator}{fol}"
+            f"{tfs.LLM_FOL}{separator}{llm_fol}"
+            f"{tfs.BLEU}{separator}{bleu}"
+            f"{tfs.LE}{separator}{le}\n"
+        )
 
-    def __call__(self,
-                 path_to_test: str,
-                 llm_pattern_name: str,
-                 instruction: str,
-                 temp_save_file_path: str,
-                 filter_prompt_end: str = None,
-                 continue_process: bool = False,
-                 separator: str = ":") -> Dict[str, Union[str, float]]:
+    def __call__(
+        self,
+        path_to_test: str,
+        llm_pattern_name: str,
+        instruction: str,
+        temp_save_file_path: str,
+        filter_prompt_end: str = None,
+        continue_process: bool = False,
+        separator: str = ":",
+    ) -> Dict[str, Union[str, float]]:
         """
         Temp save file path need for saving NL, FOL, LLM_FOL, BLEU and LE info for every processed row from MALL dataset
         """
@@ -158,19 +168,13 @@ class TestLLMMALL(TestLLM):
             data = json.load(f)
         simple_server_api = LlamaServerSimpleAPI()
         prompt_fn = PromptPatternBuilder().create(llm_pattern_name)
-        data_dict = {
-            tfs.NL: [],
-            tfs.FOL: [],
-            tfs.LLM_FOL: [],
-            tfs.BLEU: [],
-            tfs.LE: []
-        }
+        data_dict = {tfs.NL: [], tfs.FOL: [], tfs.LLM_FOL: [], tfs.BLEU: [], tfs.LE: []}
         skip_count = 0
         if continue_process:
             data_dict = self._restore_from_temp_file(filepath=temp_save_file_path, separator=separator)
             skip_count = len(data_dict[tfs.NL])
             print(f"Continue from {skip_count} row")
-        with tqdm(total=len(data), bar_format='{l_bar}{bar:10}{r_bar}{bar:-10b}') as pb:
+        with tqdm(total=len(data), bar_format="{l_bar}{bar:10}{r_bar}{bar:-10b}") as pb:
             pb.update(skip_count)
             with open(temp_save_file_path, "a+") as temp_f:
                 for item in data[skip_count:]:
@@ -186,7 +190,8 @@ class TestLLMMALL(TestLLM):
                     data_dict[tfs.BLEU].append(bleu)
                     data_dict[tfs.LE].append(le)
                     self._write_to_temp_file(temp_f, nl=text, fol=correct_fol, llm_fol=llm_fol, bleu=bleu, le=le)
-                    pb.set_postfix_str(f"\t(bleu {mean(data_dict[tfs.BLEU]):.3f}, "
-                                       f"le: {mean(data_dict[tfs.LE]):.3f})")
+                    pb.set_postfix_str(
+                        f"\t(bleu {mean(data_dict[tfs.BLEU]):.3f}, " f"le: {mean(data_dict[tfs.LE]):.3f})"
+                    )
                     pb.update(1)
         return data_dict
