@@ -31,15 +31,16 @@ class TestLLMTerminal(TestLLM):
             user_input = input("User: ")
             response = simple_api_server(prompt_fn(instruction=instruction, user_input=user_input))
             llm_fol = response["content"]
-            prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
+            llm_fol = prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
             if use_correct_fol:
                 # llm_fol: "∃x (Person(x) ∧ Sees(x, John))"
                 # correct_fol: "∃x (I(x) → Sees(x, John))"
                 correct_fol = input("Correct-FOL-rule: ")
                 le = self.le(true_text_FOL=correct_fol, pred_text_FOL=llm_fol)
                 bleu = self.bleu(true_seq=correct_fol, pred_seq=llm_fol)
-                print(f"Output: {llm_fol}. BLEU: {bleu:.3f}, LE: {le:.3f}")
-            print(f"Output: {llm_fol}")
+                print(f"Output: {llm_fol}\nBLEU: {bleu:.3f}, LE: {le:.3f}")
+            else:
+                print(f"Output: {llm_fol}")
 
 
 class TestLLMCSV(TestLLM):
@@ -65,7 +66,7 @@ class TestLLMCSV(TestLLM):
             for index, row in df.iterrows():
                 text = row[text_column]
                 llm_fol = simple_api_server(prompt_fn(instruction=instruction, user_input=text))["content"]
-                prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
+                llm_fol = prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
                 if correct_fol_column is not None:
                     correct_fol = row[correct_fol_column]
                     le = self.le(true_text_FOL=correct_fol, pred_text_FOL=llm_fol)
@@ -176,7 +177,7 @@ class TestLLMMALL(TestLLM):
                     text = item["NL"]
                     correct_fol = item["FOL"]
                     llm_fol = simple_server_api(prompt_fn(instruction=instruction, user_input=text))["content"]
-                    prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
+                    llm_fol = prompt_end_filter(output=llm_fol, filter_prompt_end=filter_prompt_end)
                     le = self.le(true_text_FOL=correct_fol, pred_text_FOL=llm_fol)
                     bleu = self.bleu(true_seq=correct_fol, pred_seq=llm_fol)
                     data_dict[tfs.NL].append(text)
