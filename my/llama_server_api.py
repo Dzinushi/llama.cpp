@@ -10,7 +10,7 @@ class LlamaServerSimpleAPI:
         data = {
             "prompt": prompt,
             "temperature": 0.1,
-            "n_predict": 128,
+            "n_predict": 256,
             "top_p": 0.75,
             "top_k": 40,
         }
